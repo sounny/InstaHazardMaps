@@ -1,5 +1,9 @@
 from typing import List
-from pystac_client import Client
+
+try:
+    from pystac_client import Client  # type: ignore
+except ModuleNotFoundError:  # pragma: no cover - optional dependency
+    Client = None
 
 DEFAULT_STAC_URL = "https://planetarycomputer.microsoft.com/api/stac/v1"
 SENTINEL_COLLECTIONS = ["sentinel-1-grd", "sentinel-2-l2a"]
@@ -16,6 +20,9 @@ def search_sentinel_scenes(aoi: dict, date: str, stac_url: str = DEFAULT_STAC_UR
     Returns:
         List of pystac.Item objects matching Sentinel-1 and Sentinel-2 collections.
     """
+    if Client is None:
+        raise ImportError("pystac_client is required to perform STAC searches")
+
     client = Client.open(stac_url)
     # Use date range if a single date is provided
     datetime_range = date if "/" in date else f"{date}/{date}"
