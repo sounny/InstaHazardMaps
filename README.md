@@ -53,6 +53,12 @@ export PLANET_API_KEY=...   # optional
 # 5  Run the first demo
 codex "Map flood damage for Cedar Key after Idalia"
 
+Browser-based STAC search
+-------------------------
+If you prefer not to install Python, open ``web/index.html`` in any modern
+browser.  Enter a bounding box and date range to query the Planetary Computer
+STAC API for recent Sentinel imagery.
+
 Contributing
 
 We welcome PRs! 
