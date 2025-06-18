@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>InstaHazard Map Viewer</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; }
+    input, button { margin: 0.5em 0; padding: 0.5em; }
+    #results { white-space: pre-wrap; background: #f0f0f0; padding: 1em; }
+  </style>
+</head>
+<body>
+  <h1>InstaHazard Map Search</h1>
+  <p>Enter a bounding box (<code>minLon,minLat,maxLon,maxLat</code>) and date range to search the Planetary Computer STAC API for Sentinel imagery.</p>
+
+  <label>Bounding Box:</label><br>
+  <input id="bbox" placeholder="-83.2,29.0,-82.8,29.3" size="40"><br>
+  <label>Start Date:</label><br>
+  <input id="start-date" type="date"><br>
+  <label>End Date:</label><br>
+  <input id="end-date" type="date"><br>
+  <button id="search">Search</button>
+
+  <h2>Results</h2>
+  <pre id="results"></pre>
+
+<script>
+const STAC_URL = "https://planetarycomputer.microsoft.com/api/stac/v1/search";
+
+function bboxToPolygon(bbox) {
+  const [minLon, minLat, maxLon, maxLat] = bbox.map(Number);
+  return {
+    type: "Polygon",
+    coordinates: [[
+      [minLon, minLat],
+      [minLon, maxLat],
+      [maxLon, maxLat],
+      [maxLon, minLat],
+      [minLon, minLat]
+    ]]
+  };
+}
+
+async function search() {
+  const bboxValue = document.getElementById('bbox').value.trim();
+  const start = document.getElementById('start-date').value;
+  const end = document.getElementById('end-date').value || start;
+  if (!bboxValue || !start) {
+    alert('Please enter a bounding box and start date.');
+    return;
+  }
+  const bbox = bboxValue.split(',');
+  if (bbox.length !== 4) {
+    alert('Bounding box must have four comma-separated numbers.');
+    return;
+  }
+
+  const body = {
+    collections: ["sentinel-1-grd", "sentinel-2-l2a"],
+    intersects: bboxToPolygon(bbox),
+    datetime: `${start}/${end}`,
+    limit: 20
+  };
+
+  try {
+    const res = await fetch(STAC_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    document.getElementById('results').textContent = JSON.stringify(data, null, 2);
+  } catch (err) {
+    document.getElementById('results').textContent = 'Error: ' + err;
+  }
+}
+
+document.getElementById('search').addEventListener('click', search);
+</script>
+</body>
+</html>
