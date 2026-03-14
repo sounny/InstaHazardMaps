@@ -53,6 +53,25 @@ export PLANET_API_KEY=...   # optional
 # 5  Run the first demo
 codex "Map flood damage for Cedar Key after Idalia"
 
+
+Mission scaffolding CLI
+-----------------------
+Generate a structured first-responder mission packet and a Codex-ready prompt:
+
+```bash
+python -m hazardwatch.mission_scaffold \
+  --incident-name "Hurricane Idalia" \
+  --hazard-type "Flood" \
+  --location "Suwannee County, FL" \
+  --date-range "2024-08-30/2024-09-02" \
+  --priority-layer "Flood extent" \
+  --priority-layer "Road blockage" \
+  --requester "Suwannee County EOC" \
+  --notes "Prioritize hospitals and shelters"
+```
+
+This writes `output/mission_packet.json` and prints a reusable prompt that can be passed to Codex CLI for automated workflow generation.
+
 Browser-based STAC search
 -------------------------
 If you prefer not to install Python, open ``web/index.html`` in any modern
