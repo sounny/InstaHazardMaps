@@ -7,7 +7,15 @@ import json
 from typing import Any, Dict, List
 
 from .pipeline import run_pipeline
-from .stac_search import DEFAULT_STAC_URL
+from .stac_search import DEFAULT_STAC_URL, SENTINEL_COLLECTIONS
+
+CLI_VERSION = "0.1.0"
+DEFAULT_PLAN_STEPS = [
+    "Validate AOI geometry and date/date-range input",
+    "Search STAC for Sentinel-1 and Sentinel-2 scenes",
+    "Rank scenes by acquisition datetime",
+    "Emit a concise result table or machine-readable JSON",
+]
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -20,6 +28,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--stac-url",
         default=DEFAULT_STAC_URL,
         help="STAC API endpoint to query (default: Planetary Computer)",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {CLI_VERSION}",
     )
 
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -37,6 +50,26 @@ def build_parser() -> argparse.ArgumentParser:
         help="Maximum number of results to print",
     )
     search_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Print machine-readable JSON output",
+    )
+
+    sources_parser = subparsers.add_parser(
+        "sources",
+        help="Show configured imagery sources and STAC endpoint.",
+    )
+    sources_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Print machine-readable JSON output",
+    )
+
+    plan_parser = subparsers.add_parser(
+        "plan",
+        help="Show planned workflow stages for the current HazardWatch CLI.",
+    )
+    plan_parser.add_argument(
         "--json",
         action="store_true",
         help="Print machine-readable JSON output",
@@ -89,12 +122,51 @@ def cmd_search(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_sources(args: argparse.Namespace) -> int:
+    payload = {
+        "stac_url": args.stac_url,
+        "collections": SENTINEL_COLLECTIONS,
+    }
+
+    if args.json:
+        print(json.dumps(payload, indent=2))
+    else:
+        print(f"STAC endpoint: {payload['stac_url']}")
+        print("Collections:")
+        for collection in payload["collections"]:
+            print(f"- {collection}")
+
+    return 0
+
+
+def cmd_plan(args: argparse.Namespace) -> int:
+    payload = {
+        "workflow": "scene-discovery",
+        "steps": DEFAULT_PLAN_STEPS,
+    }
+
+    if args.json:
+        print(json.dumps(payload, indent=2))
+    else:
+        print("HazardWatch CLI workflow plan:")
+        for idx, step in enumerate(payload["steps"], start=1):
+            print(f"{idx}. {step}")
+
+    return 0
+
+
 def main(argv: List[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
 
     if args.command == "search":
         return cmd_search(args)
+
+    if args.command == "sources":
+        return cmd_sources(args)
+
+    if args.command == "plan":
+        return cmd_plan(args)
 
     parser.error(f"Unsupported command: {args.command}")
     return 2
