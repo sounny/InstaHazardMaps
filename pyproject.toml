@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hazardwatch"
+version = "0.1.0"
+description = "Codex-style disaster mapping CLI for rapid Sentinel scene discovery"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "InstaHazard Map contributors" }]
+license = { text = "MIT" }
+dependencies = [
+  "geopandas>=1.0.1",
+  "pystac-client>=0.8.3",
+]
+
+[project.scripts]
+hazardwatch = "hazardwatch.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["hazardwatch*"]

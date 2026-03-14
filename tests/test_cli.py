@@ -49,3 +49,22 @@ def test_search_json_output(monkeypatch, capsys):
     assert rc == 0
     assert payload["count"] == 1
     assert payload["results"][0]["id"] == "item-1"
+
+
+def test_sources_human_output(capsys):
+    rc = cli.main(["sources"])
+
+    output = capsys.readouterr().out
+    assert rc == 0
+    assert "STAC endpoint:" in output
+    assert "- sentinel-1-grd" in output
+
+
+def test_plan_json_output(capsys):
+    rc = cli.main(["plan", "--json"])
+
+    output = capsys.readouterr().out
+    payload = json.loads(output)
+    assert rc == 0
+    assert payload["workflow"] == "scene-discovery"
+    assert len(payload["steps"]) >= 3

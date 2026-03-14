@@ -54,15 +54,43 @@ export PLANET_API_KEY=...   # optional
 codex "Map flood damage for Cedar Key after Idalia"
 
 
+
+Terminal install
+----------------
+Install HazardWatch as a terminal command so you can run `hazardwatch` directly:
+
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install --upgrade pip
+pip install .
+hazardwatch --help
+```
+
+If you want a global isolated install, use `pipx`:
+
+```bash
+python -m pip install --user pipx
+pipx ensurepath
+pipx install .
+hazardwatch --help
+```
+
 CLI usage
 ---------
 Run the local CLI directly with Python:
 
 ```bash
-python -m hazardwatch.cli search path/to/aoi.geojson 2025-01-01/2025-01-07 --limit 5
+hazardwatch search path/to/aoi.geojson 2025-01-01/2025-01-07 --limit 5
 ```
 
 Add `--json` for machine-readable output suitable for automation pipelines.
+
+Discover supported sources and inspect the workflow plan:
+
+```bash
+hazardwatch sources
+hazardwatch plan
+```
 
 Browser-based STAC search
 -------------------------
