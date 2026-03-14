@@ -85,6 +85,9 @@ hazardwatch search path/to/aoi.geojson 2025-01-01/2025-01-07 --limit 5
 
 Add `--json` for machine-readable output suitable for automation pipelines.
 
+By default, the CLI prints an IMH startup banner in interactive terminals.
+Set `HAZARDWATCH_NO_BANNER=1` to disable it for local scripts or demos.
+
 Discover supported sources and inspect the workflow plan:
 
 ```bash

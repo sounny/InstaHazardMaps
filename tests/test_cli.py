@@ -68,3 +68,35 @@ def test_plan_json_output(capsys):
     assert rc == 0
     assert payload["workflow"] == "scene-discovery"
     assert len(payload["steps"]) >= 3
+
+
+def test_banner_shows_for_tty_non_json(monkeypatch, capsys):
+    monkeypatch.setattr(cli.sys.stdout, "isatty", lambda: True)
+
+    rc = cli.main(["sources"])
+
+    output = capsys.readouterr().out
+    assert rc == 0
+    assert "InstaHazard Maps CLI" in output
+
+
+def test_banner_hidden_for_json_output(monkeypatch, capsys):
+    monkeypatch.setattr(cli.sys.stdout, "isatty", lambda: True)
+
+    rc = cli.main(["plan", "--json"])
+
+    output = capsys.readouterr().out
+    payload = json.loads(output)
+    assert rc == 0
+    assert payload["workflow"] == "scene-discovery"
+
+
+def test_banner_can_be_disabled_with_env(monkeypatch, capsys):
+    monkeypatch.setattr(cli.sys.stdout, "isatty", lambda: True)
+    monkeypatch.setenv("HAZARDWATCH_NO_BANNER", "1")
+
+    rc = cli.main(["sources"])
+
+    output = capsys.readouterr().out
+    assert rc == 0
+    assert "InstaHazard Maps CLI" not in output

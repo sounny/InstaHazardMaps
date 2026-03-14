@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import sys
 from typing import Any, Dict, List
 
 from .pipeline import run_pipeline
@@ -16,6 +18,17 @@ DEFAULT_PLAN_STEPS = [
     "Rank scenes by acquisition datetime",
     "Emit a concise result table or machine-readable JSON",
 ]
+
+IMH_BANNER = r"""
+╔════════════════════════════════════════════════════════════╗
+║      ██╗███╗   ███╗██╗  ██╗   InstaHazard Maps CLI       ║
+║      ██║████╗ ████║██║  ██║   Rapid disaster mapping      ║
+║      ██║██╔████╔██║███████║   Sentinel scene discovery    ║
+║      ██║██║╚██╔╝██║██╔══██║   Stay ready. Move fast.      ║
+║      ██║██║ ╚═╝ ██║██║  ██║                               ║
+║      ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝                               ║
+╚════════════════════════════════════════════════════════════╝
+""".strip("\n")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -155,9 +168,23 @@ def cmd_plan(args: argparse.Namespace) -> int:
     return 0
 
 
+def should_show_banner(args: argparse.Namespace) -> bool:
+    """Return True when the terminal banner should be printed."""
+    if os.getenv("HAZARDWATCH_NO_BANNER"):
+        return False
+
+    if getattr(args, "json", False):
+        return False
+
+    return sys.stdout.isatty()
+
+
 def main(argv: List[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+
+    if should_show_banner(args):
+        print(IMH_BANNER)
 
     if args.command == "search":
         return cmd_search(args)
