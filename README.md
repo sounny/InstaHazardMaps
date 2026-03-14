@@ -53,6 +53,17 @@ export PLANET_API_KEY=...   # optional
 # 5  Run the first demo
 codex "Map flood damage for Cedar Key after Idalia"
 
+
+CLI usage
+---------
+Run the local CLI directly with Python:
+
+```bash
+python -m hazardwatch.cli search path/to/aoi.geojson 2025-01-01/2025-01-07 --limit 5
+```
+
+Add `--json` for machine-readable output suitable for automation pipelines.
+
 Browser-based STAC search
 -------------------------
 If you prefer not to install Python, open ``web/index.html`` in any modern
